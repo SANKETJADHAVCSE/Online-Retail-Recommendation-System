@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retail Recommendation System</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            /* background: url('C:\\Users\\shail\\OneDrive\\Desktop\\PLASMID\\Online-Retail-Recommendation-System-main\\frontend\\image.avif') no-repeat center center fixed; */
+            background: url("C:\\Users\\shail\\OneDrive\\Desktop\\PLASMID\\Online-Retail-Recommendation-System-main\\frontend\\img.png");
+            /* background: url("https://unsplash.com/photos/a-shopping-cart-filled-with-gifts-and-presents-x5gx92sV6qg") no-repeat center center fixed; */
+            background-size: cover;
+            
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .navbar {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+        .navbar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .navbar ul li {
+            margin: 0 10px;
+        }
+        .navbar ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 1em;
+            transition: color 0.3s;
+        }
+        .navbar ul li a:hover {
+            color: #4a90e2;
+        }
+        .container {
+            max-width: 600px;
+            margin: 100px auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #4a90e2;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        input:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(to right, #4a90e2, #0066cc);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: linear-gradient(to right, #0066cc, #4a90e2);
+        }
+        .recommendations {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .recommendation {
+            background: #e6f7ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4a90e2;
+        }
+        .recommendation:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>ShoppingGo.com</h1>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </div>
+    <div class="container">
+        <h1>ShoppingGo</h1>
+        <div class="form-group">
+            <label for="user_id">User ID:</label>
+            <input type="text" id="user_id" placeholder="Enter User ID">
+        </div>
+        <div class="form-group">
+            <label for="product_id">Product ID:</label>
+            <input type="text" id="product_id" placeholder="Enter Product ID">
+        </div>
+        <button onclick="getHybridRecommendations()">Get Recommendations</button>
+        <div class="recommendations" id="recommendations"></div>
+    </div>
+
+    <script>
+        async function getHybridRecommendations() {
+            const userId = document.getElementById('user_id').value;
+            const productId = document.getElementById('product_id').value;
+            const recommendationsDiv = document.getElementById('recommendations');
+
+            if (!userId || !productId) {
+                recommendationsDiv.innerHTML = '<p style="color: red;">Please enter both User ID and Product ID.</p>';
+                return;
+            }
+
+            recommendationsDiv.innerHTML = '<p>Loading recommendations...</p>';
+
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/recommend/hybrid?user_id=${userId}&product_id=${productId}`);
+                const data = await response.json();
+
+                if (data.recommendations && data.recommendations.length > 0) {
+                    recommendationsDiv.innerHTML = '<h3>Recommendations:</h3>';
+                    data.recommendations.forEach(item => {
+                        const recommendationDiv = document.createElement('div');
+                        recommendationDiv.className = 'recommendation';
+                        recommendationDiv.textContent = item;
+                        recommendationsDiv.appendChild(recommendationDiv);
+                    });
+                } else {
+                    recommendationsDiv.innerHTML = '<p>No recommendations found.</p>';
+                }
+            } catch (error) {
+                recommendationsDiv.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
